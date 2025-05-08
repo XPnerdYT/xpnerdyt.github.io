@@ -1,0 +1,221 @@
+<!-- REDACTED CONTENT -->
+<!-- Assignment14: Website Design Project -->
+
+
+<html>
+
+	<head>
+		<!-- Tab Title -->
+		<title>XPnerd</title>
+		<!-- Tab Icon -->
+		<link rel="icon" href="images/logo/favicon.png">
+		<style>
+		
+			/* Global CSS */
+			* {
+			color: #ffffff;
+			font-size: 13px;
+			font-family: 'Segoe UI Variable Display', Tahoma, Geneva, Verdana, sans-serif;
+			line-height: 1.6;
+			}
+			
+			
+			
+			/* CSS For Body */
+			body {
+			margin: 0;
+			padding: 0;
+			background-image: url('images/background/background-image.png');
+			background-repeat: no-repeat;
+			background-size: cover;
+			background-attachment: fixed;
+			}
+			
+			
+			/* CSS For Buttons/Links */
+			a {
+			border: 0px;
+			padding: 6px 10px 7px 10px;
+			border-radius: 3px;
+			color: #d2d2d2;
+			margin-left: 5px;
+			background-color: transparent;
+			transition-duration: 0.2s;
+			text-decoration: none;
+			}
+			
+			
+			
+			
+			/* CSS Navigation Bar */
+			.otherpagebutton:hover {
+			background-color: #2d2d2d;
+			}
+			
+			.square {  /* Background of Navbar */
+			display: flex;
+			padding-left: 18px;
+			height: 60px;
+			width: 100%;
+			background-color: rgb(33, 33, 33, 0.6);
+			position: fixed;
+			backdrop-filter: blur(5px);
+			-webkit-backdrop-filter: blur(5px);
+			align-items: center;
+			}
+			
+			.currentpagebutton {  /* CSS for current page button */
+			color: #9aecfe;
+			background-color: #2d2d2d;
+			}
+			
+			.homelogo {  /* Logo Padding */
+			padding: 0px 10px 0px 0px !important;
+			}
+			
+			.homelogoo {
+			margin-bottom: -4px;
+			}
+			
+			
+			.homelogo:hover {
+			opacity: 0.6;
+			}
+			
+			.navbaricon {
+			margin-right: 5px;
+			margin-bottom: -1px;
+			}
+			
+			.innerbody {
+			padding: 7% 5% 5% 8%;
+			}
+			
+			
+			/* CSS for header section */
+			.titletext {
+			font-size: 48px;
+			font-weight: 600;
+			line-height: 1.1;
+			}
+			
+			.caption {
+			font-size: 14px;
+			font-weight: 400;
+			color: hsla(0, 0%, 100%, 54.42%);
+			}
+			
+			.accentedbutton {  /* Buttons... */
+			background-color: #62cdfe;
+			color: #000000;
+			margin: 0;
+			}
+			
+			.accentedbutton:hover {
+			background-color: #5bbbe8;
+			}
+			
+			.unaccentedbutton {
+			color: #9aecfe;
+			margin: 0px 0px 0px 10px;
+			}
+			
+			.unaccentedbutton:hover {
+			background-color: rgb(45, 45, 45, 0.6);
+			}
+			
+			
+			
+			/* CSS For Palettes/Info about me */
+			.palettetitle {
+			font-size: 30px;
+			margin-top: 20px;
+			margin-left: -2px;
+			font-weight: 600;
+			}
+			
+			.palettetext {
+			margin-left: -1px;
+			font-size: 15px;
+			color: #bbbbbb;
+			margin-top: -20px;
+			}
+			
+			.palette {
+			background-color: rgb(32, 32, 32, 0.8);
+			border-radius: 14px;
+			padding: 30px 35px 20px 35px;
+			}
+			
+			.palettes {
+			padding-bottom: 6%;
+			}
+			
+		</style>
+	</head>
+	
+	<body bgcolor=#1c1c1c>
+		<div class="square">
+		
+			<!-- Navbar Table -->
+			<table height=40px>
+				<tr>
+					<td><a href='index.html' class="homelogo"><img src="images/logo/Group.png" height=18px alt="Logo" class="homelogoo"></a></td>
+					<td><a href='index.html' class="otherpagebutton"><img src="images/navbar/home-deselected.svg" height=12px alt="Home Icon" class="navbaricon">Home</a></td>
+					<td><a href='art.html' class="otherpagebutton"><img src="images/navbar/art-deselected.svg" height=12px alt="Art Icon" class="navbaricon">Art</a></td>
+					<td><a href='contact.html' class="otherpagebutton"><img src="images/navbar/contact-deselected.svg" height=12px alt="Contact Icon" class="navbaricon">Contact</a></td>
+					<td><a href='interests.html' class="currentpagebutton"><img src="images/navbar/interests-selected.svg" height=12px alt="Interests Icon" class="navbaricon">Interests</a></td>
+				</tr>
+			</table>
+			
+		</div>
+		<div class="innerbody">
+			<!-- Header section and title -->
+			<table width=95% height=85%>
+				<tr>
+					<td align=left valign=bottom height=48%><p class="titletext">You really want to know more about me..?</p></td>
+					<td align=center rowspan=3 width=30%><img src="images/visuals/interests.png" alt="Visual Box Image" width=400px></td>					
+				</tr>
+				<tr>
+					<td align=left valign=top height=52%><br><p class="caption">So... I mean, you can take a look for yourself then. Just click the button below-</p><br><a href="#interests" class="accentedbutton">Interests</a><a href="index.html#aboutme" class="unaccentedbutton">More about me</a></td>
+				</tr>
+			</table>
+			
+		</div>
+		
+		<div class="palettes" id="interests">
+			
+			<!-- Info about me, palettes of stuff. -->
+			<table width=95% cellspacing=20px  align=center>
+				<tr height=100%>
+					<!-- Music Palette -->
+					<td width=50% align=left valign=top class="palette">
+						<img src="images/paletteicons/music.svg" width=100px alt="music">
+						<p class="palettetitle">Music</p>
+						<p class="palettetext">I play the piano. In fact, I've been playing for the past 8 years of my life. I got interested in playing it after hearing my brother play it every day. Now, I am learning the 10th level in the Royal Conservatory of Music piano program. I am also pretty good at the violin, which I started learning in grade 8. I'm also slightly experienced with xylophones, since I played one for an entire year in grade 7. In that year, my teacher let me play drums, too, although I'll admit I'm pretty bad at it. I also own a baby grand, by the way :D</p>
+					</td>
+					<!-- ThinkPad Palette -->
+					<td width=50% align=left valign=top class="palette">
+						<img src="images/paletteicons/thinkpadt42.webp" width=100px alt="thinkpad">
+						<p class="palettetitle">ThinkPad</p>
+						<p class="palettetext">I got my first laptop when I was 6. Yes, I know, sounds pretty crazy. I also got my first phone when I was 7, in the morning of Christmas. And yes, I'm very thankful my dad provided me with so many opportunities. Since then, I have switched through over 6 laptops, 3 of which were ThinkPads and have gotten sold for some decent money. I often buy and sell laptops for a higher price than I bought it for (second-hand), and since my parents don't really provide me with a lot of money, most electronics I own (e.g. phone, laptop, etc.) were bought with my own money - much of it was made flipping laptops. You could say, I'm pretty obsessed with ThinkPads. I really like them... mostly because my dad has only bought ThinkPads after his T42 from 2008. They really are built like tanks.</p>
+					</td>
+				</tr>	
+				<tr>
+					<!-- Repair Palette -->
+					<td width=50% align=left valign=top class="palette">
+						<img src="images/paletteicons/wrench.svg" width=100px alt="wrench">
+						<p class="palettetitle">Repairing</p>
+						<p class="palettetext">My dad is a trashpicker. It's also the reason my garage is filled with a dozen bikes, most of which are completely functioning, since he taught me how to fix them. I then got quite obsessed with fixing things, starting with a robot vacuum all the way to my second phone he gave me - an iPhone 5C. The accomplished feeling after fixing such a small thing thats practically glued together for the first time, is pretty insane... Since those days, I've also repaired many laptops, repasted them, and stuff on those lines. I once repasted 9 all-in-one computers in 5 hours while in China, at my uncle's company. It was pretty cool.</p>
+					</td>
+					<!-- IT Palette -->
+					<td width=50% align=left valign=top class="palette">
+						<img src="images/paletteicons/server.svg" width=100px alt="server">
+						<p class="palettetitle">IT stuff</p>
+						<p class="palettetext">After getting very obsessed with ThinkPads, I went on to buy a server- yes, I know, pretty weird. I can explain... I wanted to make a home server with a few terabytes so that my whole family could access files more easily without needing to go on each other's computers. Now obviously, the best way would be to use an old laptop or something. What's the fun in that? Instead, I went for a pretty cheap server... A HP DL360e Gen8, which I bought for a really good 70 CAD. It was really fun setting it up, although it was pretty hilarious as I didn't even have a keyboard lying around because my whole family has only bought laptops after the PS/2 keyboard/mouse eras. </p>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</body>
+</html>

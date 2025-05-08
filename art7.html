@@ -1,0 +1,201 @@
+<!-- REDACTED CONTENT -->
+<!-- Assignment14: Website Design Project -->
+
+<html>
+
+	<head>
+		<title>XPnerd</title>
+		<link rel="icon" href="images/logo/favicon.png">
+		<style>
+			* {
+			color: #ffffff;
+			font-size: 13px;
+			font-family: 'Segoe UI Variable Display', Tahoma, Geneva, Verdana, sans-serif;
+			line-height: 1.6;
+			}
+			
+			body {
+			margin: 0;
+			padding: 0;
+			background-image: url('images/background/background-image.png');
+			background-repeat: no-repeat;
+			background-size: cover;
+			background-attachment: fixed;
+			}
+			
+			a {
+			border: 0px;
+			padding: 6px 10px 7px 10px;
+			border-radius: 3px;
+			color: #d2d2d2;
+			margin-left: 5px;
+			background-color: transparent;
+			transition-duration: 0.2s;
+			text-decoration: none;
+			}
+			
+			.otherpagebutton:hover {
+			background-color: #2d2d2d;
+			}
+			
+			.square {
+			display: flex;
+			padding-left: 18px;
+			height: 60px;
+			width: 100%;
+			background-color: rgb(33, 33, 33, 0.6);
+			position: fixed;
+			backdrop-filter: blur(5px);
+			-webkit-backdrop-filter: blur(5px);
+			align-items: center;
+			}
+			
+			.currentpagebutton {
+			color: #9aecfe;
+			background-color: #2d2d2d;
+			}
+			
+			.homelogo {
+			padding: 0 10 0 0 !important;
+			}
+			
+			.homelogoo {
+			margin-bottom: -4px;
+			}
+			
+			
+			.homelogo:hover {
+			opacity: 0.6;
+			}
+			
+			.navbaricon {
+			margin-right: 5px;
+			margin-bottom: -1px;
+			}
+			
+			.innerbody {
+			padding: 80px 20px 20px 20px;
+			}
+			
+			.titletext {
+			font-size: 48px;
+			font-weight: 600;
+			line-height: 1.1;
+			}
+			
+			.caption {
+			font-size: 14px;
+			font-weight: 400;
+			color: hsla(0, 0%, 100%, 54.42%);
+			}
+			
+			.accentedbutton {
+			background-color: #62cdfe;
+			color: #000000;
+			margin: 0;
+			}
+			
+			.accentedbutton:hover {
+			background-color: #5bbbe8;
+			}
+			
+			.unaccentedbutton {
+			color: #9aecfe;
+			margin: 0px 0px 0px 10px;
+			}
+			
+			.unaccentedbutton:hover {
+			background-color: rgb(45, 45, 45, 0.6);
+			}
+			
+			.artcontainer {
+			overflow: hidden;
+			margin: 0px;
+			padding: 0px;
+			}
+			
+			.artcontainerbackground {
+			background-color: rgb(32, 32, 32, 0.7);
+			padding: 2% 0 1.5% 0;
+			margin: 5% 15% 1% 15%;
+			border-radius: 2%;
+			}
+			
+			.chevron:hover, .artcontainer:hover {
+			opacity: 0.6;
+			}
+			
+			.currentartnav {
+			border-radius: 8%;
+			border: 3.5px solid;
+			border-color: #9AECFE;
+			}
+			
+			.artnav {
+			background-color: #2d2d2d;
+			border-radius: 8%;
+			transition-duration: 0.05s;
+			}
+			
+			.artnav:hover {
+			border: 3.5px solid;
+			border-color: grey;
+			}
+			
+			
+		
+		</style>
+	</head>
+	
+	<body bgcolor=#1c1c1c>
+		<div class="square">
+			<table height=40px class="navbar">
+				<tr>
+					<td><a href='index.html' class="homelogo"><img src="images/logo/Group.png" height=18px alt="Logo" class="homelogoo"></a></td>
+					<td><a href='index.html' class="otherpagebutton"><img src="images/navbar/home-deselected.svg" height=12px alt="Home Icon" class="navbaricon">Home</a></td>
+					<td><a href='art.html' class="currentpagebutton"><img src="images/navbar/art-selected.svg" height=12px alt="Art Icon" class="navbaricon">Art</a></td>
+					<td><a href='contact.html' class="otherpagebutton"><img src="images/navbar/contact-deselected.svg" height=12px alt="Contact Icon" class="navbaricon">Contact</a></td>
+					<td><a href='interests.html' class="otherpagebutton"><img src="images/navbar/interests-deselected.svg" height=12px alt="Interests Icon" class="navbaricon">Interests</a></td>
+				</tr>
+			</table>
+		</div>
+		<div class="innerbody">
+			<table width=95% height=85% style="margin-left: 5%">
+				<tr>
+					<td align=left valign=bottom height=45%><p class="titletext">Everything starts somewhere.</p></td>
+					<td align=center rowspan=3 width=30%><img src="images/visuals/art-canvas.png" alt="Visual Box Image" width=300px></td>					
+				</tr>
+				<tr>
+					<td align=left valign=top height=55%><br><p class="caption">Skills don't magically get mastered. It takes time, passion, and dedication. Whether it's playing an instrument, or becoming picasso, we all start somewhere... I started drawing ever since i was 4, and even now, I am still far from mastering the skill of drawing. In fact, I'd argue most of my art is terrible. So, here are a few pieces of art from my collection!</p><br><a href="#artgallery" class="accentedbutton">Art Gallery</a></td>
+				</tr>
+			</table>
+			<div class="artcontainerbackground" id="artgallery">				
+				<table width=90% height=80% align=center>
+					<tr height=83% width=83%>
+						<td align=center><a href="art6.html#artgallery" class="chevron"><img src="images/chevrons/chevron-left.svg" width=80% alt="chevron-left"></a></td>
+						<td colspan=7 align=center><img src="images/artimages/Frame7.png" width=85% class="containerimage"></td>
+						<td align=center><a href="art8.html#artgallery" class="chevron"><img src="images/chevrons/chevron-right.svg" width=80% alt="chevron-right"></a></td>
+					</tr>
+					<tr height=12%>
+						<td width=11.11% align=center><a href="art.html#artgallery" class="artcontainer"><img src="images/artimages/Frame1.png" width=90% alt="image" class="artnav"></a></td>
+						<td width=11.11% align=center><a href="art2.html#artgallery" class="artcontainer"><img src="images/artimages/Frame2.png" width=90% alt="image" class="artnav"></a></td>
+						<td width=11.11% align=center><a href="art3.html#artgallery" class="artcontainer"><img src="images/artimages/Frame3.png" width=90% alt="image" class="artnav"></a></td>
+						<td width=11.11% align=center><a href="art4.html#artgallery" class="artcontainer"><img src="images/artimages/Frame4.png" width=90% alt="image" class="artnav"></a></td>
+						<td width=11.11% align=center><a href="art5.html#artgallery" class="artcontainer"><img src="images/artimages/Frame5.png" width=90% alt="image" class="artnav"></a></td>
+						<td width=11.11% align=center><a href="art6.html#artgallery" class="artcontainer"><img src="images/artimages/Frame6.png" width=90% alt="image" class="artnav"></a></td>
+						<td width=11.11% align=center><a href="art7.html#artgallery" class="artcontainer"><img src="images/artimages/Frame7.png" border=3px width=90% alt="image" class="currentartnav"></a></td>
+						<td width=11.11% align=center><a href="art8.html#artgallery" class="artcontainer"><img src="images/artimages/Frame8.png" width=90% alt="image" class="artnav"></a></td>
+						<td width=11.11% align=center><a href="art9.html#artgallery" class="artcontainer"><img src="images/artimages/Frame9.png" width=90% alt="image" class="artnav"></a></td>
+					</tr>
+					<tr height=5%>
+						<td colspan=9>
+							<br>
+							<p><b>A little about it</b></p>
+							<p>This was one of my first oil paintings. It's also my favorite. I painted it when I was around 8, and my brother also painted a copy.</p>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</body>
+</html>
