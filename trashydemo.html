@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Trashy - Interactive 3D smart trash bin simulation.">
+  <title>Trashy</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    :root {
+      --canvas-top: #E9E6DE;
+      --canvas-bottom: #C7C1B4;
+      --panel-bg: #F8F6F2;
+      --ink: #242420;
+      --ink-soft: #6B6A63;
+      --line: #DAD5C9;
+      --steel: #4C6B8A;
+      --steel-soft: #DCE4EA;
+      --idle-dot: #B9B4A6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--ink);
+      overflow: hidden;
+    }
+
+    body {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+    }
+
+    #stage {
+      position: relative;
+      background: radial-gradient(120% 100% at 50% 20%, var(--canvas-top), var(--canvas-bottom));
+    }
+
+    #stage canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+
+    #stage canvas:active {
+      cursor: grabbing;
+    }
+
+    #hint {
+      position: absolute;
+      left: 24px;
+      bottom: 20px;
+      font-size: 12px;
+      color: var(--ink-soft);
+      user-select: none;
+      pointer-events: none;
+    }
+
+    #panel {
+      background: var(--panel-bg);
+      border-left: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      padding: 28px 26px 22px;
+      overflow-y: auto;
+    }
+
+    #wordmark {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    #tagline {
+      margin-top: 8px;
+      font-size: 13.5px;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--line);
+      margin: 20px 0;
+    }
+
+    .section-label {
+      font-size: 11px;
+      color: var(--ink-soft);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    #status-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: ui-monospace, "SF Mono", "JetBrains Mono", monospace;
+      font-size: 13px;
+    }
+
+    #status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--idle-dot);
+      transition: background 0.25s ease;
+      flex-shrink: 0;
+    }
+
+    #status-dot.pulse {
+      animation: pulse 0.9s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(0.75); }
+    }
+
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .trigger-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      background: #FFFFFF;
+      border-radius: 5px;
+      font-size: 13px;
+      color: var(--ink);
+      cursor: pointer;
+      transition: border-color 0.15s ease, transform 0.1s ease;
+    }
+
+    .trigger-btn:hover { border-color: var(--steel); }
+    .trigger-btn:active { transform: scale(0.97); }
+    .trigger-btn:disabled { opacity: 0.45; cursor: default; transform: none; }
+
+    .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    #auto-btn {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--steel);
+      background: var(--steel-soft);
+      color: var(--steel);
+      border-radius: 5px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    #auto-btn:active { transform: scale(0.98); }
+    #auto-btn.active { background: var(--steel); color: #FFFFFF; }
+
+    #specs {
+      font-family: ui-monospace, "SF Mono", "JetBrains Mono", monospace;
+      font-size: 12px;
+      color: var(--ink-soft);
+      line-height: 1.9;
+    }
+
+    #specs div { display: flex; justify-content: space-between; }
+    #specs span:last-child { color: var(--ink); }
+
+    #howitworks {
+      font-size: 12.5px;
+      color: var(--ink-soft);
+      line-height: 1.7;
+    }
+
+    #howitworks ol { margin: 0; padding-left: 18px; }
+    #howitworks li { margin-bottom: 6px; }
+
+    @media (max-width: 760px) {
+      body {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr auto;
+      }
+      #panel {
+        border-left: none;
+        border-top: 1px solid var(--line);
+        max-height: 52vh;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main id="stage">
+    <div id="hint">Drag to rotate &nbsp;·&nbsp; Scroll to zoom</div>
+  </main>
+
+  <aside id="panel">
+    <h1 id="wordmark">Trashy</h1>
+    <p id="tagline">A 3-category smart trash bin featuring an automated sliding door and an integrated AI vision camera to sort waste dynamically.</p>
+
+    <div class="divider"></div>
+
+    <div class="section-label">Status</div>
+    <div id="status-row">
+      <div id="status-dot"></div>
+      <span id="status-text">Idle — ready</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-label">Simulate Item Drop</div>
+    <div class="btn-grid" id="trigger-grid"></div>
+    <button type="button" id="auto-btn">Run continuous demo</button>
+
+    <div class="divider"></div>
+
+    <div class="section-label">How It Works</div>
+    <div id="howitworks">
+      <ol>
+        <li>Item rests directly on the top sector right below the central camera.</li>
+        <li>Camera identifies item type and rotates the internal 3-compartment drum.</li>
+        <li>Door sector rotates around the central shaft to drop the item into place.</li>
+        <li>If hazardous material is detected, the lid locks and rejects the item.</li>
+      </ol>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-label">Specifications</div>
+    <div id="specs">
+      <div><span>Height</span><span>64 cm</span></div>
+      <div><span>Diameter</span><span>36 cm</span></div>
+      <div><span>Shell (upper)</span><span>Smoked Acrylic</span></div>
+      <div><span>Shell (lower)</span><span>Brushed Steel</span></div>
+    </div>
+  </aside>
+
+<script>
+(() => {
+  const CATEGORIES = [
+    { id: 'recycling', label: 'Recycling', color: 0x2B7FFF, angle: 270, isHazardous: false },
+    { id: 'compost',   label: 'Compost',   color: 0x34C759, angle: 30,  isHazardous: false },
+    { id: 'garbage',   label: 'Garbage',   color: 0xF5C242, angle: 150, isHazardous: false },
+    { id: 'hazardous', label: 'Hazardous', color: 0xE54D42, angle: 270, isHazardous: true  }
+  ];
+
+  const stage = document.getElementById('stage');
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  stage.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 500);
+
+  const orbit = { azimuth: 0, polar: 0.85, radius: 130, target: new THREE.Vector3(0, 28, 0) };
+  let idleTimeout = null;
+  let isIdle = true;
+
+  const updateCameraFromOrbit = () => {
+    const x = orbit.target.x + orbit.radius * Math.sin(orbit.polar) * Math.sin(orbit.azimuth);
+    const y = orbit.target.y + orbit.radius * Math.cos(orbit.polar);
+    const z = orbit.target.z + orbit.radius * Math.sin(orbit.polar) * Math.cos(orbit.azimuth);
+    camera.position.set(x, y, z);
+    camera.lookAt(orbit.target);
+  };
+  updateCameraFromOrbit();
+
+  let dragging = false;
+  let lastX = 0;
+  let lastY = 0;
+
+  const resetIdleTimer = () => {
+    isIdle = false;
+    if (idleTimeout) clearTimeout(idleTimeout);
+    idleTimeout = setTimeout(() => { isIdle = true; }, 1500);
+  };
+
+  renderer.domElement.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    lastX = e.clientX;
+    lastY = e.clientY;
+    resetIdleTimer();
+  });
+
+  window.addEventListener('pointerup', () => { 
+    dragging = false; 
+    resetIdleTimer();
+  });
+
+  window.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    const dx = e.clientX - lastX;
+    const dy = e.clientY - lastY;
+    lastX = e.clientX;
+    lastY = e.clientY;
+    orbit.azimuth -= dx * 0.006;
+    orbit.polar = Math.max(0.1, Math.min(1.4, orbit.polar - dy * 0.006));
+    updateCameraFromOrbit();
+    resetIdleTimer();
+  });
+
+  renderer.domElement.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    orbit.radius = Math.max(70, Math.min(230, orbit.radius + e.deltaY * 0.08));
+    updateCameraFromOrbit();
+    resetIdleTimer();
+  }, { passive: false });
+
+  // Lighting
+  scene.add(new THREE.AmbientLight(0xFFFFFF, 0.75));
+
+  const keyLight = new THREE.DirectionalLight(0xFFF3E6, 0.65);
+  keyLight.position.set(50, 110, 60);
+  keyLight.castShadow = true;
+  keyLight.shadow.mapSize.set(1024, 1024);
+  keyLight.shadow.camera.left = -60;
+  keyLight.shadow.camera.right = 60;
+  keyLight.shadow.camera.top = 60;
+  keyLight.shadow.camera.bottom = -60;
+  scene.add(keyLight);
+
+  const fillLight = new THREE.DirectionalLight(0xDAE6F2, 0.3);
+  fillLight.position.set(-50, 40, -40);
+  scene.add(fillLight);
+
+  // Ground Plane
+  const ground = new THREE.Mesh(
+    new THREE.CircleGeometry(140, 48),
+    new THREE.ShadowMaterial({ opacity: 0.15 })
+  );
+  ground.rotation.x = -Math.PI / 2;
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  // Dimensions
+  const FOOT_R = 19.5, FOOT_H = 2;
+  const BODY_R = 18, BODY_H = 38, BODY_Y0 = FOOT_H;
+  const SHELL_R = 18, SHELL_H = 20, SHELL_Y0 = BODY_Y0 + BODY_H;
+  const RIM_Y = SHELL_Y0 + SHELL_H;
+  const DRUM_R = 16.6, DRUM_H = 33, DRUM_Y0 = 4.5;
+  const FUNNEL_DEPTH = 3.5;
+
+  const DROP_Z = 10.0;
+  const DROP_Y_TOP = RIM_Y - FUNNEL_DEPTH + (FUNNEL_DEPTH * ((10.0 - 1.8) / (SHELL_R - 1.8)));
+
+  const trashyRoot = new THREE.Group();
+  scene.add(trashyRoot);
+
+  // Base / Body Assembly
+  const foot = new THREE.Mesh(
+    new THREE.CylinderGeometry(FOOT_R, FOOT_R * 1.02, FOOT_H, 48),
+    new THREE.MeshStandardMaterial({ color: 0x30343A, roughness: 0.7, metalness: 0.2 })
+  );
+  foot.position.y = FOOT_H / 2;
+  foot.castShadow = foot.receiveShadow = true;
+  trashyRoot.add(foot);
+
+  const bodyMat = new THREE.MeshStandardMaterial({ color: 0xA8ACAF, roughness: 0.5, metalness: 0.5 });
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(BODY_R, BODY_R, BODY_H, 64, 1, true), bodyMat);
+  body.position.y = BODY_Y0 + BODY_H / 2;
+  body.castShadow = body.receiveShadow = true;
+  trashyRoot.add(body);
+
+  const seamMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.5, metalness: 0.2 });
+  const seam = new THREE.Mesh(new THREE.TorusGeometry(BODY_R + 0.05, 0.55, 12, 64), seamMat);
+  seam.rotation.x = Math.PI / 2;
+  seam.position.y = SHELL_Y0;
+  trashyRoot.add(seam);
+
+  const shell = new THREE.Mesh(
+    new THREE.CylinderGeometry(SHELL_R, BODY_R, SHELL_H, 64, 1, true),
+    new THREE.MeshPhysicalMaterial({
+      color: 0x9FB0BD, transparent: true, opacity: 0.22, roughness: 0.3, metalness: 0.05,
+      side: THREE.DoubleSide, depthWrite: false
+    })
+  );
+  shell.position.y = SHELL_Y0 + SHELL_H / 2;
+  trashyRoot.add(shell);
+
+  const rimRing = new THREE.Mesh(
+    new THREE.TorusGeometry(SHELL_R, 0.7, 14, 64),
+    new THREE.MeshStandardMaterial({ color: 0xB5B8BA, roughness: 0.5, metalness: 0.4 })
+  );
+  rimRing.rotation.x = Math.PI / 2;
+  rimRing.position.y = RIM_Y;
+  rimRing.castShadow = true;
+  trashyRoot.add(rimRing);
+
+  // Inner Rotating Drum
+  const drum = new THREE.Group();
+  trashyRoot.add(drum);
+
+  const drumWall = new THREE.Mesh(
+    new THREE.CylinderGeometry(DRUM_R, DRUM_R, DRUM_H, 64, 1, true),
+    new THREE.MeshStandardMaterial({ color: 0xE7E4DC, roughness: 0.7, metalness: 0.05, transparent: true, opacity: 0.85 })
+  );
+  drumWall.position.y = DRUM_Y0 + DRUM_H / 2;
+  drum.add(drumWall);
+
+  const binSectors = CATEGORIES.filter(c => !c.isHazardous);
+  binSectors.forEach(cat => {
+    const shape = new THREE.Shape();
+    shape.moveTo(0, 0);
+    for (let i = 0; i <= 30; i++) {
+      const rad = THREE.Math.degToRad((cat.angle - 60) + (120 * (i / 30)));
+      shape.lineTo(Math.cos(rad) * (DRUM_R - 0.4), Math.sin(rad) * (DRUM_R - 0.4));
+    }
+    shape.lineTo(0, 0);
+
+    const floor = new THREE.Mesh(
+      new THREE.ExtrudeGeometry(shape, { depth: 3, bevelEnabled: false }),
+      new THREE.MeshStandardMaterial({ color: cat.color, roughness: 0.7, metalness: 0.05 })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = DRUM_Y0 + 3;
+    floor.castShadow = floor.receiveShadow = true;
+    drum.add(floor);
+
+    // Text Label Setup
+    const canvas = document.createElement('canvas');
+    canvas.width = 256; canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    ctx.font = '700 36px system-ui, sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(cat.label, 128, 32);
+
+    const chip = new THREE.Mesh(
+      new THREE.PlaneGeometry(12, 3),
+      new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(canvas), transparent: true })
+    );
+    const rad = THREE.Math.degToRad(cat.angle);
+    chip.position.set(Math.cos(rad) * DRUM_R * 0.55, DRUM_Y0 + 3.1, -Math.sin(rad) * DRUM_R * 0.55);
+    chip.rotation.x = -Math.PI / 2;
+    chip.rotation.z = rad - Math.PI / 2;
+    drum.add(chip);
+  });
+
+  const dividerMat = new THREE.MeshStandardMaterial({ color: 0xF3F1EC, roughness: 0.6, metalness: 0.1 });
+  [90, 210, 330].forEach(deg => {
+    const wall = new THREE.Mesh(new THREE.BoxGeometry(DRUM_R - 0.4, DRUM_H - 2, 0.5), dividerMat);
+    wall.position.set(0, DRUM_Y0 + (DRUM_H - 2) / 2 + 1, 0);
+    wall.rotation.y = THREE.Math.degToRad(deg);
+    wall.translateX((DRUM_R - 0.4) / 2);
+    wall.castShadow = true;
+    drum.add(wall);
+  });
+
+  // Top Plate & Sliding Door
+  const topPlateGroup = new THREE.Group();
+  topPlateGroup.position.y = RIM_Y;
+  trashyRoot.add(topPlateGroup);
+
+  const funnelPts = [new THREE.Vector2(1.8, -FUNNEL_DEPTH), new THREE.Vector2(SHELL_R, 0)];
+
+  const funnelCover = new THREE.Mesh(
+    new THREE.LatheGeometry(funnelPts, 48, THREE.Math.degToRad(60), THREE.Math.degToRad(240)),
+    new THREE.MeshStandardMaterial({ color: 0x666A6D, roughness: 0.95, metalness: 0.0, side: THREE.DoubleSide })
+  );
+  topPlateGroup.add(funnelCover);
+
+  const wedgeDoorGroup = new THREE.Group();
+  wedgeDoorGroup.position.y = -0.05;
+  topPlateGroup.add(wedgeDoorGroup);
+
+  const wedgeDoor = new THREE.Mesh(
+    new THREE.LatheGeometry(funnelPts, 24, THREE.Math.degToRad(-60), THREE.Math.degToRad(120)),
+    new THREE.MeshStandardMaterial({ color: 0x82878A, roughness: 0.90, metalness: 0.0, side: THREE.DoubleSide })
+  );
+  wedgeDoorGroup.add(wedgeDoor);
+
+  // Camera Unit
+  const camGroup = new THREE.Group();
+  camGroup.position.set(0, -FUNNEL_DEPTH + 0.4, 0);
+  topPlateGroup.add(camGroup);
+
+  camGroup.add(new THREE.Mesh(
+    new THREE.CylinderGeometry(2.0, 2.0, 1.2, 32),
+    new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.5, metalness: 0.5 })
+  ));
+
+  const camLed = new THREE.Mesh(
+    new THREE.SphereGeometry(0.35, 12, 12),
+    new THREE.MeshStandardMaterial({ color: 0x2B7FFF, emissive: 0x2B7FFF, emissiveIntensity: 0.8 })
+  );
+  camLed.position.set(0, 0.8, 1.2);
+  camGroup.add(camLed);
+
+  // Simulated Waste Item
+  const item = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(1.6, 0),
+    new THREE.MeshStandardMaterial({ color: 0x2B7FFF, roughness: 0.5, metalness: 0.05, transparent: true })
+  );
+  item.castShadow = true;
+  item.position.set(0, DROP_Y_TOP + 1.2, DROP_Z);
+  trashyRoot.add(item);
+
+  // Animation Helpers
+  const easeInOutCubic = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+  const tween = (duration, onUpdate, onComplete, ease = easeInOutCubic) => {
+    let start = null;
+    const step = (ts) => {
+      if (!start) start = ts;
+      const progress = Math.min(1, (ts - start) / duration);
+      onUpdate(ease(progress));
+      if (progress < 1) requestAnimationFrame(step);
+      else if (onComplete) onComplete();
+    };
+    requestAnimationFrame(step);
+  };
+
+  // UI Control Logic
+  const statusText = document.getElementById('status-text');
+  const statusDot = document.getElementById('status-dot');
+  const triggerGrid = document.getElementById('trigger-grid');
+  const autoBtn = document.getElementById('auto-btn');
+
+  let isBusy = false;
+  let autoRunning = false;
+  let autoIndex = 0;
+
+  CATEGORIES.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'trigger-btn';
+    btn.innerHTML = `<span class="swatch" style="background:#${cat.color.toString(16).padStart(6, '0')}"></span>${cat.label}`;
+    btn.addEventListener('click', () => runCycle(cat));
+    triggerGrid.appendChild(btn);
+  });
+
+  const setButtonsDisabled = disabled => {
+    Array.from(triggerGrid.children).forEach(b => b.disabled = disabled);
+  };
+
+  const setStatus = (text, mode, colorOverride) => {
+    statusText.textContent = text;
+    statusDot.classList.toggle('pulse', mode === 'busy');
+    if (colorOverride) {
+      statusDot.style.background = colorOverride;
+    } else {
+      const map = { idle: 'var(--idle-dot)', busy: 'var(--steel)', done: '#34C759' };
+      statusDot.style.background = map[mode] || 'var(--idle-dot)';
+    }
+  };
+
+  const runCycle = (cat, onDone) => {
+    if (isBusy) return;
+    isBusy = true;
+    resetIdleTimer();
+    setButtonsDisabled(true);
+
+    item.material.color.set(cat.color);
+    item.material.opacity = 1;
+    item.visible = true;
+    item.position.set(0, DROP_Y_TOP + 1.2, DROP_Z);
+
+    setStatus('Item placed beneath camera…', 'busy');
+
+    setTimeout(() => {
+      setStatus('Scanning item with AI vision…', 'busy');
+      camLed.material.color.set(0xFFFFFF);
+      camLed.material.emissive.set(0xFFFFFF);
+
+      setTimeout(() => {
+        camLed.material.color.set(cat.color);
+        camLed.material.emissive.set(cat.color);
+
+        if (cat.isHazardous) {
+          setStatus('HAZARD DETECTED! Lid Locked', 'busy', '#E54D42');
+          seam.material.emissive.set(0xE54D42);
+          tween(250, t => seam.material.emissiveIntensity = 0.9 * t);
+
+          tween(500, t => {
+            item.position.z = DROP_Z + (18 * t);
+            item.position.y = (DROP_Y_TOP + 1.2) + (6 * t) - (16 * t * t);
+            item.material.opacity = 1 - t;
+          }, () => {
+            item.visible = false;
+            setStatus('Hazardous Item Rejected', 'done', '#E54D42');
+            tween(400, t => seam.material.emissiveIntensity = 0.9 * (1 - t), () => resetCycle(onDone));
+          });
+        } else {
+          setStatus(`Identified: ${cat.label}`, 'busy');
+          seam.material.emissive.set(cat.color);
+          tween(220, t => seam.material.emissiveIntensity = 0.6 * t);
+
+          const current = drum.rotation.y;
+          const targetBase = THREE.Math.degToRad(270 - cat.angle);
+          const twoPi = Math.PI * 2;
+          let delta = (((targetBase % twoPi) + twoPi) % twoPi) - (((current % twoPi) + twoPi) % twoPi);
+          if (delta < -Math.PI) delta += twoPi;
+          if (delta > Math.PI) delta -= twoPi;
+
+          setStatus(`Rotating drum to ${cat.label}…`, 'busy');
+          tween(800, t => drum.rotation.y = current + delta * t, () => rotateDoorAndDrop(cat, onDone));
+        }
+      }, 500);
+    }, 400);
+  };
+
+  const rotateDoorAndDrop = (cat, onDone) => {
+    setStatus('Opening sliding door…', 'busy');
+    const startAng = wedgeDoorGroup.rotation.y;
+    const targetAng = startAng - THREE.Math.degToRad(120);
+
+    tween(500, t => {
+      wedgeDoorGroup.rotation.y = startAng + (targetAng - startAng) * t;
+      if (t > 0.3) {
+        const dropT = (t - 0.3) / 0.7;
+        item.position.y = (DROP_Y_TOP + 1.2) + ((DRUM_Y0 + 6) - (DROP_Y_TOP + 1.2)) * dropT;
+        item.rotation.x += 0.1;
+      }
+    }, () => {
+      tween(200, t => item.material.opacity = 1 - t, () => {
+        item.visible = false;
+        closeDoor(onDone);
+      });
+    });
+  };
+
+  const closeDoor = (onDone) => {
+    setStatus('Closing door…', 'busy');
+    const currentAng = wedgeDoorGroup.rotation.y;
+    tween(450, t => wedgeDoorGroup.rotation.y = currentAng * (1 - t), () => {
+      tween(400, t => seam.material.emissiveIntensity = 0.6 * (1 - t));
+      setStatus('Sorted & Ready', 'done');
+      resetCycle(onDone);
+    });
+  };
+
+  const resetCycle = (onDone) => {
+    camLed.material.color.set(0x2B7FFF);
+    camLed.material.emissive.set(0x2B7FFF);
+    setTimeout(() => {
+      item.material.color.set(0x2B7FFF);
+      item.material.opacity = 1;
+      item.position.set(0, DROP_Y_TOP + 1.2, DROP_Z);
+      item.visible = true;
+
+      setStatus('Idle — ready', 'idle');
+      isBusy = false;
+      resetIdleTimer();
+      setButtonsDisabled(false);
+      if (onDone) onDone();
+    }, 600);
+  };
+
+  autoBtn.addEventListener('click', () => {
+    autoRunning = !autoRunning;
+    autoBtn.classList.toggle('active', autoRunning);
+    autoBtn.textContent = autoRunning ? 'Stop demo' : 'Run continuous demo';
+    if (autoRunning) runAutoStep();
+    else resetIdleTimer();
+  });
+
+  const runAutoStep = () => {
+    if (!autoRunning) return;
+    const cat = CATEGORIES[autoIndex++ % CATEGORIES.length];
+    runCycle(cat, () => {
+      if (autoRunning) setTimeout(runAutoStep, 600);
+    });
+  };
+
+  const handleResize = () => {
+    const w = stage.clientWidth;
+    const h = stage.clientHeight;
+    renderer.setSize(w, h);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  };
+  window.addEventListener('resize', handleResize);
+  handleResize();
+
+  const animate = () => {
+    requestAnimationFrame(animate);
+
+    // Smooth idle auto-rotation when user is not interacting or running an animation cycle
+    if (isIdle && !dragging && !isBusy) {
+      orbit.azimuth += 0.0025;
+      updateCameraFromOrbit();
+    }
+
+    renderer.render(scene, camera);
+  };
+  animate();
+})();
+</script>
+</body>
+</html>
